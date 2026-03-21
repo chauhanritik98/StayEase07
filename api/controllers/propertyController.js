@@ -40,9 +40,9 @@ export const createNewProperty = async (req, res, next) => {
         )
       );
     }
-    if (regularPrice < 10000) {
+    if (regularPrice < 100) {
       return next(
-        errorHandler(400, `Regular price must be greater than 10000.`)
+        errorHandler(400, `Regular price must be greater than 100.`)
       );
     }
 
