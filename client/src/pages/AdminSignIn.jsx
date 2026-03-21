@@ -15,7 +15,7 @@ const AdminSignIn = () => {
         `${import.meta.env.VITE_BACKEND_URL}/admin/signin`,
         {
           method: "POST",
-          credentials: "include",
+          // credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },
