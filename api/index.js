@@ -2,6 +2,7 @@ import express from "express";
 import colors from "colors";
 import cors from "cors";
 import dotenv from "dotenv";
+import chatbotRoutes from "./chatbot.js";
 import cookieParser from "cookie-parser";
 import connectDB from "./db/db.js";
 import authRouter from "./routes/authRoutes.js";
@@ -12,7 +13,7 @@ dotenv.config();
 
 const PORT = process.env.PORT || 4000;
 connectDB();
-
+ 
 const app = express();
 
 const corsOptions = {
@@ -48,6 +49,9 @@ app.use((err, req, res, next) => {
   });
 });
 
+app.use("/api", chatbotRoutes);
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`.rainbow.italic.underline);
 });
+

@@ -1,3 +1,4 @@
+import Chatbot from "../components/Chatbot";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import {
@@ -84,6 +85,7 @@ const Home = () => {
     <>
       <Hero />
       <AboutUs />
+      <Chatbot /> 
       {isLoadingProperties ? (
         <Loader />
       ) : allTypesHaveErrors ? (
