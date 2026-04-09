@@ -85,7 +85,7 @@ const Home = () => {
     <>
       <Hero />
       <AboutUs />
-      <Chatbot />
+      <Chatbot /> 
       {isLoadingProperties ? (
         <Loader />
       ) : allTypesHaveErrors ? (

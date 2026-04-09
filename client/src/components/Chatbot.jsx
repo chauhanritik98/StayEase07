@@ -44,7 +44,7 @@ const Chatbot = () => {
         },
         body: JSON.stringify({ message: input })
       });
-
+ 
       const data = await res.json();
 
       const botMsg = {
