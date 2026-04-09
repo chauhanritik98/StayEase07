@@ -33,7 +33,7 @@ const Chatbot = () => {
       sender: "user",
       time: getTime()
     };
-
+ 
     setMessages((prev) => [...prev, userMsg]);
 
     try {

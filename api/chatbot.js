@@ -14,7 +14,7 @@ router.post("/chat", async (req, res) => {
     // 🧠 INTENT DETECTION
     // =========================
     let intent = "general";
-
+ 
     if (message.includes("rent")) intent = "rent";
     else if (message.includes("buy") || message.includes("purchase")) intent = "buy";
     else if (message.includes("sell")) intent = "sell";
