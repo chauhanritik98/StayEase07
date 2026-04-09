@@ -37,14 +37,18 @@ const Chatbot = () => {
     setMessages((prev) => [...prev, userMsg]);
 
     try {
-      const res = await fetch("https://stayease07.onrender.com", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ message: input })
-      });
- 
+      const API_URL =
+  window.location.hostname === "localhost"
+    ? "http://localhost:4000"
+    : "https://stayease07.onrender.com";
+
+const res = await fetch(`${API_URL}/api/chat`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({ message: input })
+});
       const data = await res.json();
 
       const botMsg = {
