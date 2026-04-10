@@ -84,9 +84,9 @@ const SellerInfo = ({ property, onError }) => {
       sellerLocalNo: sellerInfo?.localno,
     };
 
-    const serviceID = "service_qycyx02";
-    const templateID = "template_hdz7ef4";
-    const userID = "7fWtiqQrwNqT9pZCz";
+    const serviceID = "service_b3m728b";
+    const templateID = "template_z5l0w3a";
+    const userID = "TFcQTo-FR2W6qb9vk";
 
     setSubmitLoading(true);
 
@@ -272,6 +272,7 @@ const SellerInfo = ({ property, onError }) => {
           >
             {submitLoading ? "Sending..." : "Send Message"}
           </button>
+          
         </form>
       </div>
 
