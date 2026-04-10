@@ -96,7 +96,7 @@ const Footer = () => {
         <p>
           &copy; {new Date().getFullYear()}{" "}
           <a
-            href="https://stayease.vercel.app/"
+            href="https://stay-ease07.vercel.app/"
             className="font-semibold text-blue-700 cursor-pointer"
           >
             StayEase.com

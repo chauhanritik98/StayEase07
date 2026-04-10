@@ -3,60 +3,64 @@ import { toast } from "react-toastify";
 import emailjs from "emailjs-com";
 
 const ContactForm = () => {
-  const [contactInfo, setContactInfo] = useState({
-    userName: "",
-    userEmail: "",
-    userMessage: "",
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    contactno: "",
+    message: "",
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // ********* Handle Input Changes ********* //
+  const [submitLoading, setSubmitLoading] = useState(false);
+
+  // ✅ Same as SellerInfo
   const handleInputChange = (e) => {
-    const { id, value } = e.target;
-    setContactInfo({
-      ...contactInfo,
-      [id]: value,
-    });
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
-  // ********* Handle Form Submission ********* //
-  const handleFormSubmit = (e) => {
+  // ✅ Same working logic
+  const handleSubmit = (e) => {
     e.preventDefault();
 
-    setIsSubmitting(true);
+    const { name, email, contactno, message } = formData;
 
-    const serviceID = "service_b3m728b";
-    const templateID = "template_35prkpr";
-    const userID = "TFcQTo-FR2W6qb9vk";
-
-    const { userName, userEmail, userMessage } = contactInfo;
-    if (!userName || !userEmail || !userMessage) {
+    if (!name || !email || !contactno || !message) {
       toast.error("Please fill out all fields.");
-      setIsSubmitting(false);
       return;
     }
 
+    const templateParams = {
+      customerName: name,
+      customerEmail: email,
+      customerContactNo: contactno,
+      customerMessage: message,
+    };
+
+    const serviceID = "service_b3m728b";
+    const templateID = "template_z5l0w3a";
+    const userID = "TFcQTo-FR2W6qb9vk";
+
+    setSubmitLoading(true);
+
     emailjs
-      .send(serviceID, templateID, contactInfo, userID)
+      .send(serviceID, templateID, templateParams, userID)
       .then(() => {
-        setIsSubmitting(false);
-        toast.success(
-          "Your message has been sent successfully. We'll get in touch with you soon."
-        );
-        setContactInfo({
-          userName: "",
-          userEmail: "",
-          userMessage: "",
+        setSubmitLoading(false);
+        toast.success("Your message has been sent successfully!");
+
+        setFormData({
+          name: "",
+          email: "",
+          contactno: "",
+          message: "",
         });
       })
-      .catch((error) => {
-        setIsSubmitting(false);
-        console.log(error);
-
-        toast.error(
-          error.message ||
-            "Failed to send your message. Please try again later."
-        );
+      .catch(() => {
+        setSubmitLoading(false);
+        toast.error("Failed to send your message. Please try again later.");
       });
   };
 
@@ -65,37 +69,50 @@ const ContactForm = () => {
       <h2 className="text-2xl font-semibold text-blue-700 mb-4">
         Send Us a Message
       </h2>
-      <form onSubmit={handleFormSubmit} className="flex flex-col gap-4">
+
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           type="text"
-          id="userName"
-          value={contactInfo.userName}
+          name="name"
+          value={formData.name}
           onChange={handleInputChange}
           placeholder="Your Name"
           className="border rounded-lg p-4 w-full border-gray-300 outline-none focus:border-blue-700 transition duration-300"
         />
+
         <input
           type="email"
-          id="userEmail"
-          value={contactInfo.userEmail}
+          name="email"
+          value={formData.email}
           onChange={handleInputChange}
           placeholder="Your Email"
           className="border rounded-lg p-4 w-full border-gray-300 outline-none focus:border-blue-700 transition duration-300"
         />
+
+        <input
+          type="text"
+          name="contactno"
+          value={formData.contactno}
+          onChange={handleInputChange}
+          placeholder="Your Contact Number"
+          className="border rounded-lg p-4 w-full border-gray-300 outline-none focus:border-blue-700 transition duration-300"
+        />
+
         <textarea
-          id="userMessage"
-          value={contactInfo.userMessage}
+          name="message"
+          value={formData.message}
           onChange={handleInputChange}
           placeholder="Your Message"
-          className="border rounded-lg p-4 w-full border-gray-300 outline-none focus:border-blue-700 transition duration-300"
           rows={4}
+          className="border rounded-lg p-4 w-full border-gray-300 outline-none focus:border-blue-700 transition duration-300"
         />
+
         <button
           type="submit"
+          disabled={submitLoading}
           className="py-3 px-6 bg-blue-700 text-white rounded-lg hover:bg-blue-800 transition duration-300 font-semibold"
-          disabled={isSubmitting}
         >
-          {isSubmitting ? "Sending..." : "Send Message"}
+          {submitLoading ? "Sending..." : "Send Message"}
         </button>
       </form>
     </div>

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { FaComments, FaTimes } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const Chatbot = () => {
   const [open, setOpen] = useState(false);
@@ -12,6 +13,7 @@ const Chatbot = () => {
   ]);
   const [input, setInput] = useState("");
   const chatEndRef = useRef(null);
+  const navigate = useNavigate();
 
   function getTime() {
     return new Date().toLocaleTimeString([], {
@@ -20,7 +22,6 @@ const Chatbot = () => {
     });
   }
 
-  // Auto scroll
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -33,33 +34,36 @@ const Chatbot = () => {
       sender: "user",
       time: getTime()
     };
- 
-    setMessages((prev) => [...prev, userMsg]);
+
+    setMessages(prev => [...prev, userMsg]);
 
     try {
       const API_URL =
-  window.location.hostname === "localhost"
-    ? "http://localhost:4000"
-    : "https://stayease07.onrender.com";
+        window.location.hostname === "localhost"
+          ? "http://localhost:4000"
+          : "https://stayease07.onrender.com";
 
-const res = await fetch(`${API_URL}/api/chat`, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({ message: input })
-});
+      const res = await fetch(`${API_URL}/api/chat`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message: input })
+      });
+
       const data = await res.json();
 
       const botMsg = {
         text: data.reply || "No response",
         sender: "bot",
-        time: getTime()
+        time: getTime(),
+        properties: data.properties || []
       };
 
-      setMessages((prev) => [...prev, botMsg]);
-    } catch (error) {
-      setMessages((prev) => [
+      setMessages(prev => [...prev, botMsg]);
+
+    } catch {
+      setMessages(prev => [
         ...prev,
         {
           text: "Server error 😢",
@@ -76,57 +80,86 @@ const res = await fetch(`${API_URL}/api/chat`, {
     <>
       {/* Floating Button */}
       <div
-  style={styles.fab}
-  onClick={() => setOpen(!open)}
-  onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.1)")}
-  onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
->
+        style={styles.fab}
+        onClick={() => setOpen(!open)}
+        onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.1)")}
+        onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+      >
         {open ? <FaTimes /> : <FaComments />}
       </div>
 
       {/* Chat Window */}
       {open && (
         <div style={styles.container}>
-          {/* Header */}
           <div style={styles.header}>StayEase Assistant</div>
 
-          {/* Chat Area */}
           <div style={styles.chatBox}>
             {messages.map((msg, i) => (
-              <div
-                key={i}
-                style={{
-                  display: "flex",
-                  justifyContent:
-                    msg.sender === "user" ? "flex-end" : "flex-start"
-                }}
-              >
+              <div key={i}>
+
+                {/* TEXT MESSAGE */}
                 <div
                   style={{
-                    ...styles.message,
-                    background:
-                      msg.sender === "user" ? "#2563eb" : "#e5e7eb",
-                    color:
-                      msg.sender === "user" ? "#fff" : "#111827",
-                    borderTopRightRadius:
-                      msg.sender === "user" ? "0" : "12px",
-                    borderTopLeftRadius:
-                      msg.sender === "bot" ? "0" : "12px"
+                    display: "flex",
+                    justifyContent:
+                      msg.sender === "user" ? "flex-end" : "flex-start"
                   }}
                 >
-                  {msg.text}
-                  <div style={styles.time}>{msg.time}</div>
+                  <div
+                    style={{
+                      ...styles.message,
+                      background:
+                        msg.sender === "user" ? "#2563eb" : "#e5e7eb",
+                      color:
+                        msg.sender === "user" ? "#fff" : "#111827"
+                    }}
+                  >
+                    {msg.text}
+                    <div style={styles.time}>{msg.time}</div>
+                  </div>
                 </div>
+
+                {/* 🏡 PROPERTY CARDS */}
+                {msg.properties && msg.properties.length > 0 && (
+                  <div style={styles.cardContainer}>
+                    {msg.properties.map((p, index) => (
+                      <div key={index} style={styles.card}>
+                        <img
+                          src={p.imageUrls?.[0]}
+                          alt=""
+                          style={styles.image}
+                        />
+
+                        <div style={styles.cardContent}>
+                          <h4>{p.title}</h4>
+                          <p>📍 {p.address}</p>
+                          <p>💰 ₹{p.regularPrice}</p>
+                          <p>
+                            🛏 {p.bedrooms} Bed | 🛁 {p.bathrooms}
+                          </p>
+
+                          <button
+                            style={styles.viewBtn}
+                            onClick={() => navigate(`/property/${p._id}`)}
+                          >
+                            View Details
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
               </div>
             ))}
             <div ref={chatEndRef}></div>
           </div>
 
-          {/* Input Area */}
+          {/* Input */}
           <div style={styles.inputBox}>
             <input
               type="text"
-              placeholder="Type a message..."
+              placeholder="Ask about properties..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
               style={styles.input}
@@ -144,45 +177,45 @@ const res = await fetch(`${API_URL}/api/chat`, {
 
 const styles = {
   fab: {
-  position: "fixed",
-  bottom: "25px",
-  right: "25px",
-  width: "70px",        // increased size
-  height: "70px",       // increased size
-  background: "#2563eb",
-  color: "#fff",
-  borderRadius: "50%",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  fontSize: "28px",     // bigger icon
-  cursor: "pointer",
-  boxShadow: "0 6px 18px rgba(37,99,235,0.5)",
-  zIndex: 999,
-  transition: "all 0.3s ease",
-  animation: "pulse 2s infinite"
-},
+    position: "fixed",
+    bottom: "25px",
+    right: "25px",
+    width: "70px",
+    height: "70px",
+    background: "#2563eb",
+    color: "#fff",
+    borderRadius: "50%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "28px",
+    cursor: "pointer",
+    boxShadow: "0 6px 18px rgba(37,99,235,0.5)",
+    zIndex: 999,
+    transition: "all 0.3s ease",
+    animation: "pulse 2s infinite"
+  },
 
   container: {
     position: "fixed",
     bottom: "90px",
     right: "25px",
-    width: "320px",
-    height: "450px",
+    width: "350px",
+    height: "500px",
     background: "#ffffff",
     borderRadius: "14px",
     display: "flex",
     flexDirection: "column",
     overflow: "hidden",
-    boxShadow: "0 10px 25px rgba(0,0,0,0.15)"
+    boxShadow: "0 10px 25px rgba(0,0,0,0.2)"
   },
 
   header: {
     background: "#2563eb",
     color: "#fff",
     padding: "12px",
-    fontWeight: "600",
-    textAlign: "center"
+    textAlign: "center",
+    fontWeight: "600"
   },
 
   chatBox: {
@@ -196,10 +229,7 @@ const styles = {
     maxWidth: "75%",
     padding: "8px 12px",
     margin: "6px",
-    borderRadius: "12px",
-    fontSize: "14px",
-    position: "relative",
-    boxShadow: "0 1px 2px rgba(0,0,0,0.08)"
+    borderRadius: "12px"
   },
 
   time: {
@@ -209,19 +239,51 @@ const styles = {
     color: "#6b7280"
   },
 
+  cardContainer: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "10px",
+    margin: "10px"
+  },
+
+  card: {
+    background: "#fff",
+    borderRadius: "10px",
+    overflow: "hidden",
+    boxShadow: "0 4px 10px rgba(0,0,0,0.1)"
+  },
+
+  image: {
+    width: "100%",
+    height: "150px",
+    objectFit: "cover"
+  },
+
+  cardContent: {
+    padding: "10px"
+  },
+
+  viewBtn: {
+    marginTop: "8px",
+    background: "#2563eb",
+    color: "#fff",
+    border: "none",
+    padding: "6px 10px",
+    borderRadius: "6px",
+    cursor: "pointer"
+  },
+
   inputBox: {
     display: "flex",
     padding: "8px",
-    background: "#fff",
-    borderTop: "1px solid #e5e7eb"
+    borderTop: "1px solid #ddd"
   },
 
   input: {
     flex: 1,
     padding: "10px",
     borderRadius: "20px",
-    border: "1px solid #e5e7eb",
-    outline: "none"
+    border: "1px solid #ddd"
   },
 
   button: {
@@ -232,8 +294,7 @@ const styles = {
     width: "40px",
     height: "40px",
     color: "#fff",
-    cursor: "pointer",
-    fontSize: "16px"
+    cursor: "pointer"
   }
 };
 
